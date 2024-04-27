@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" class="h-100" data-bs-theme="auto">
+<head>
+    <script src="{{ url_for('static', filename='js/color-modes.js') }}"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>DaForum &middot; {% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap 5.3.x -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Bootstrap icons -->
+    <link href="{{ url_for('static', filename='font/bootstrap-icons.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+    <script>
+        function darkModeToggle() {
+            if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                document.getElementById("darkModeToggleSun").style.display = "none";
+                document.getElementById("darkModeToggleMoon").style.display = "block";
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.getElementById("darkModeToggleSun").style.display = "block";
+                document.getElementById("darkModeToggleMoon").style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark" aria-label="Navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">DaForum</a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#globalNavbar"
+                aria-controls="globalNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="globalNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <!-- TODO: Make active section change based on current section -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Following</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-disabled="true">Saved posts</a>
+                </li>
+            </ul>
+            <form role="search">
+                <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-shrink-0 mt-5 py-5">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer navbar-fixed-bottom mt-auto py-3 bg-body-tertiary">
+    <button type="button" class="align-self-end float-end btn" onclick="darkModeToggle()">
+        <svg id="darkModeToggleSun" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16">
+              <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+        </svg>
+        <svg id="darkModeToggleMoon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-moon-fill" viewBox="0 0 16 16">
+          <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
+        </svg>
+    </button>
+    <div class="container">
+        <span class="text-body-secondary">&copy; Copyright by Niggus. All rights given out for 20$ and a fresh hot dog.</span>
+    </div>
+</footer>
+</body>
+</html>

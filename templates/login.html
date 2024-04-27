@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<form class="form-signin" method="POST">
+    {{ form.hidden_tag() }}
+
+    <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="Logo" width="72" height="57">
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+    <div class="form-floating mb-3">
+        {{ form.username(class='form-control', placeholder='Username') }}
+        {{ form.username.label }}
+    </div>
+    <div class="form-floating mb-3">
+        {{ form.password(class='form-control', placeholder='Password') }}
+        {{ form.password.label }}
+    </div>
+
+    <div class="checkbox mb-3">
+        {{ form.remember(class='form-check-input') }}
+        {{ form.remember.label(class='form-check-label') }}
+    </div>
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
+
+    <p>Don't have an account? <a href="/signup">Sign up</a></p>
+</form>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<form class="form-new-thread" method="POST">
+    {{ form.hidden_tag() }}
+
+    <h1 class="h3 mb-3 fw-normal">New Thread</h1>
+
+    <div class="mb-3">
+        {{ form.title(class='form-control', placeholder='Title') }}
+    </div>
+    <div class="mb-3">
+        {{ form.body(class='form-control', rows='5', placeholder='Body') }}
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
+</form>
+
+{% endblock %}

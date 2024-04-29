@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Edit profile{% endblock %}
+
+{% block content %}
+
+    <div class="m-5">
+        <div class="card">
+            <form class="card-body" id="editForm" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <h2>{{ current_user.username }}</h2>
+
+                <div class="mb-3">
+                    <canvas width="256" height="256" id="pfpCanvas" style="z-index: 1">Your browser doesn't support canvas</canvas>
+                </div>
+                <div class="mb-3">
+                    {{ form.profilePicture(onchange="handleFileSelect()") }}
+                </div>
+
+                <div class="text-muted">
+                    <label for="user_id">User ID:</label>
+                    <input id="user_id" value="{{ current_user.id }}" type="text" class="form-control" readonly>
+                </div>
+
+                <div class="mb-3">
+                    {{ form.username.label(class='form-label') }}
+                    {{ form.username(class='form-control') }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.email.label(class='form-label') }}
+                    {{ form.email(class='form-control') }}
+                </div>
+
+                <p>
+                    Created on:
+                    <br>
+                    {{ current_user.created_at|dateformat('dd.MM.y') }} ({{ current_user.created_at|timedeltaformat }} ago)
+                </p>
+
+                <div class="mb-3">
+                    {{ form.password.label(class='form-label') }}
+                    {{ form.password(class='form-control') }}
+                </div>
+
+                <div class="invisible" style="display: none">
+                    {{ form.profilePictureCropX }}
+                    {{ form.profilePictureCropY }}
+                    {{ form.profilePictureCropSize }}
+                </div>
+
+                {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/cropper.js') }}"></script>
+    <script>
+        {% if current_user.has_profile_pic %}
+        let currentPfp = "{{ config.MINIO_ENDPOINT + current_user.id }}";
+        {% else %}
+        let currentPfp = "{{ url_for('static', filename='img/profile.png') }}";
+        {% endif %}
+
+        let canvas = document.getElementById("pfpCanvas");
+        let ctx = canvas.getContext("2d");
+        let img = new Image();
+        img.src = currentPfp;
+        img.onload = ev => {
+            ctx.drawImage(img,0,0,256,256);
+        };
+        let currentFile;
+
+        cropper.start(canvas, 1); // initialize cropper by providing it with a target canvas and a XY ratio (height = width * ratio)
+        function handleFileSelect() {
+            // this function will be called when the file input below is changed
+            currentFile = document.getElementById("profilePicture").files[0];  // get a reference to the selected file
+
+            let reader = new FileReader(); // create a file reader
+            // set an onload function to show the image in cropper once it has been loaded
+            reader.onload = function(event) {
+                let data = event.target.result; // the "data url" of the image
+                cropper.showImage(data); // hand this to cropper, it will be displayed
+                cropper.startCropping();
+            };
+
+            reader.readAsDataURL(currentFile); // this loads the file as a data url calling the function above once done
+        }
+
+        document.getElementById("editForm").onsubmit = ev => {
+            document.getElementById("{{ form.profilePictureCropX.id }}").value = cropper.getCroppedInfo().x;
+            document.getElementById("{{ form.profilePictureCropY.id }}").value = cropper.getCroppedInfo().y;
+            document.getElementById("{{ form.profilePictureCropSize.id }}").value = cropper.getCroppedInfo().width;
+        }
+            {#console.log("Submitting");#}
+            {#let fileElement = document.getElementById("profilePicture");#}
+            {#let blob = cropper.getCroppedImageBlob();#}
+            {#if (blob === false || blob === true /* Not a blob type */){#}
+            {#    console.log("Wasn't a blob");#}
+            {#    return;#}
+            {#let file = new File([blob], fileElement.files[0].name,#}
+            {#    {type:fileElement.files[0].type, lastModified:new Date().getTime()});#}
+            {#let container = new DataTransfer();#}
+            {#container.items.add(file);#}
+            {#fileElement.files = container.files;#}
+    </script>
+{% endblock %}

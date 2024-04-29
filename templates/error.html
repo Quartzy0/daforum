@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error.code }} {{ error.name }}{% endblock %}
+
+{% block content %}
+
+<div class="h-100 d-flex flex-column justify-content-center align-items-center">
+    <h1>{{ error.code }} {{ error.name }}</h1>
+    {{ error.description }}
+</div>
+
+{% endblock %}

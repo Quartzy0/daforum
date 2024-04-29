@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    <div class="m-5">
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ user.username }}</h2>
+
+                <p class="text-muted">
+                    User Id:
+                    <br>
+                    {{ user.id }}
+                </p>
+
+                {% if current_user.is_authenticated %}
+                <p>
+                    Email:
+                    <br>
+                    {{ user.email }}
+                </p>
+                {% endif %}
+
+                <p>
+                    Created on:
+                    <br>
+                    {{ user.created_at|dateformat('dd.MM.y') }} ({{ user.created_at|timedeltaformat }} ago)
+                </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Sign up{% endblock %}
 
 {% block content %}
 
@@ -14,23 +14,28 @@
         {{ form.username(class='form-control', placeholder='Username') }}
         {{ form.username.label }}
     </div>
+    <br>
+    <div class="form-floating mb-3">
+        {{ form.email(class='form-control', placeholder='Email') }}
+        {{ form.email.label }}
+    </div>
+    <br>
     <div class="form-floating mb-3">
         {{ form.password(class='form-control', placeholder='Password') }}
         {{ form.password.label }}
+    </div>
+    <br>
+    <div class="form-floating mb-3">
+        {{ form.passwordConfirmation(class='form-control', placeholder='Confirm Password') }}
+        {{ form.passwordConfirmation.label }}
     </div>
 
     <div class="checkbox mb-3">
         {{ form.remember(class='form-check-input') }}
         {{ form.remember.label(class='form-check-label') }}
     </div>
-    {% if error %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
-    </div>
-    {% endif %}
     {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
-
-    <p>Don't have an account? <a href="/signup">Sign up</a></p>
+    <p>Already have an account? <a href="{{ url_for('users.login', **request.args) }}">Log in</a></p>
 </form>
 
 {% endblock %}

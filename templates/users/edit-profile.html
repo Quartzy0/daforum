@@ -38,6 +38,8 @@
                     {{ current_user.created_at|dateformat('dd.MM.y') }} ({{ current_user.created_at|timedeltaformat }} ago)
                 </p>
 
+                <a class="link-body-emphasis" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">View your threads</a>
+
                 <div class="mb-3">
                     {{ form.password.label(class='form-label') }}
                     {{ form.password(class='form-control') }}
@@ -59,11 +61,7 @@
 {% block javascript %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/cropper.js') }}"></script>
     <script>
-        {% if current_user.has_profile_pic %}
-        let currentPfp = "{{ config.MINIO_ENDPOINT + current_user.id }}";
-        {% else %}
-        let currentPfp = "{{ url_for('static', filename='img/profile.png') }}";
-        {% endif %}
+        let currentPfp = "{{ current_user.get_profile_pic() }}";
 
         let canvas = document.getElementById("pfpCanvas");
         let ctx = canvas.getContext("2d");
@@ -91,9 +89,10 @@
         }
 
         document.getElementById("editForm").onsubmit = ev => {
-            document.getElementById("{{ form.profilePictureCropX.id }}").value = cropper.getCroppedInfo().x;
-            document.getElementById("{{ form.profilePictureCropY.id }}").value = cropper.getCroppedInfo().y;
-            document.getElementById("{{ form.profilePictureCropSize.id }}").value = cropper.getCroppedInfo().width;
+            let croppedInfo = cropper.getCroppedInfo();
+            document.getElementById("{{ form.profilePictureCropX.id }}").value = croppedInfo.x;
+            document.getElementById("{{ form.profilePictureCropY.id }}").value = croppedInfo.y;
+            document.getElementById("{{ form.profilePictureCropSize.id }}").value = croppedInfo.width;
         }
             {#console.log("Submitting");#}
             {#let fileElement = document.getElementById("profilePicture");#}

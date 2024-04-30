@@ -1,5 +1,7 @@
+import markdown
 from flask_babel import Babel
 from flask import Flask, render_template
+from flask_pagedown import PageDown
 from werkzeug.exceptions import HTTPException
 
 from users import users, login_manager
@@ -17,6 +19,12 @@ app.register_blueprint(threads)
 login_manager.init_app(app)
 db.init_app(app)
 minio.init_app(app)
+pagedown = PageDown(app)
+
+
+@app.template_filter('render_markdown')
+def render_markdown(s):
+    return markdown.markdown(s)
 
 
 @app.get("/")

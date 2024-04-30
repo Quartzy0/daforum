@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}New Thread{% endblock %}
 
 {% block content %}
 
@@ -13,7 +13,25 @@
         {{ form.title(class='form-control', placeholder='Title') }}
     </div>
     <div class="mb-3">
-        {{ form.body(class='form-control', rows='5', placeholder='Body') }}
+        <i class="text-body-tertiary">Tip: Write 2 or more spaces at the end of a line to fonce a line break</i>
+        {{ form.body(only_input=True, class='form-control', rows='11', placeholder='Reply') }}
+    </div>
+    <div class="mb-3">
+        <h3>Preview:</h3>
+        <div class="m-5 card d-flex flex-row-reverse">
+            <div class="card-body">
+                {{ form.body(only_preview=True) }}
+            </div>
+            <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
+                <img src="{{ current_user.get_profile_pic() }}" alt="{{ current_user.username }}" width="128" height="128">
+                <p><a href="{{ url_for('users.view_user', user_id=current_user.id) }}">{{ current_user.username }}</a>
+                <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;" id="replaceDate">
+                    Posted on !DATE!
+                    <br>
+                    (0s ago)
+                </p>
+            </div>
+        </div>
     </div>
 
     {% if error %}
@@ -24,4 +42,16 @@
     {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
 </form>
 
+{% endblock %}
+
+{% block extra_head %}
+{{ pagedown.html_head() }}
+{% endblock %}
+
+{% block javascript %}
+<script>
+let date = new Date();
+let dateString = date.getDate() + "." + date.getMonth() + "." + date.getFullYear();
+document.getElementById("replaceDate").innerHTML = document.getElementById("replaceDate").innerHTML.replace("!DATE!", dateString);
+</script>
 {% endblock %}

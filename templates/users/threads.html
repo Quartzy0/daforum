@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - Threads{% endblock %}
+
+{% block content %}
+
+<div class="m-5">
+{% if current_user.is_authenticated and user.id==current_user.id %}
+    <h1>Your threads:</h1>
+{% else %}
+    <h1><a href="{{ url_for('users.view_user', user_id=user.id) }}">{{ user.username }}'s</a> threads:</h1>
+{% endif %}
+{% for thread in threads %}
+    <div class="card d-flex flex-row-reverse border-5 expand-effect clickable" onclick="window.location.href='{{ url_for('thread.view_thread', thread_id=thread.id) }}'">
+        <div class="card-body d-flex flex-column p-0">
+            <div class="bg-body-tertiary flex-shrink-1">
+                <h5 class="card-title m-2">{{ thread.title }}</h5>
+            </div>
+            <div class="m-2">
+                {{ thread.body | render_markdown | safe }}
+            </div>
+        </div>
+        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
+            <img src="{{ thread.author.get_profile_pic() }}" alt="{{ thread.author.username }}" width="128" height="128">
+            <p><a href="{{ url_for('users.view_user', user_id=thread.author.id) }}">{{ thread.author.username }}</a>
+            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
+                Posted on {{ thread.posted|dateformat('dd.MM.y') }}
+                <br>
+                ({{ thread.posted|timedeltaformat }} ago)
+            </p>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}

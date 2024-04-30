@@ -24,3 +24,29 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+@keyframes expand-effect-animation {
+    from {transform: scale(1);}
+    to {transform: scale(1.01);}
+}
+
+@keyframes expand-effect-animation-reverse {
+    from {transform: scale(1.01);}
+    to {transform: scale(1);}
+}
+
+.expand-effect:hover {
+    animation-name: expand-effect-animation;
+    animation-duration: 0.3s;
+    transform: scale(1.01);
+}
+
+.expand-effect {
+    animation-name: expand-effect-animation-reverse;
+    animation-duration: 0.3s;
+    transform: scale(1);
+}
+
+.clickable {
+    cursor: pointer;
+}

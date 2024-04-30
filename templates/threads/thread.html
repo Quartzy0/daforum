@@ -6,22 +6,34 @@
 <div class="m-5">
     <h1>{{ thread.title }}</h1>
 
-    <div class="card">
+    <div class="card d-flex flex-row-reverse">
         <div class="card-body">
-            {{ thread.body }}
+            {{ thread.body | render_markdown | safe }}
         </div>
-        <div class="card-footer">
-            Posted by <a href="{{ url_for('users.view_user', user_id=thread.author.id) }}">{{ thread.author.username }}</a> on {{ thread.posted|dateformat('dd.MM.y') }} ({{ thread.posted|timedeltaformat }} ago).
+        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
+            <img src="{{ thread.author.get_profile_pic() }}" alt="{{ thread.author.username }}" width="128" height="128">
+            <p><a href="{{ url_for('users.view_user', user_id=thread.author.id) }}">{{ thread.author.username }}</a>
+            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
+                Posted on {{ thread.posted|dateformat('dd.MM.y') }}
+                <br>
+                ({{ thread.posted|timedeltaformat }} ago)
+            </p>
         </div>
     </div>
 
     {% for post in posts %}
-    <div class="card">
+    <div class="card d-flex flex-row-reverse">
         <div class="card-body">
-            {{ post.body }}
+            {{ post.body | render_markdown | safe }}
         </div>
-        <div class="card-footer">
-            Posted by <a href="{{ url_for('users.view_user', user_id=post.author.id) }}">{{ post.author.username }}</a> on {{ post.posted|dateformat('dd.MM.y') }} ({{ post.posted|timedeltaformat }} ago).
+        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
+            <img src="{{ post.author.get_profile_pic() }}" alt="{{ post.author.username }}" width="128" height="128">
+            <p><a href="{{ url_for('users.view_user', user_id=post.author.id) }}">{{ post.author.username }}</a>
+            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
+                Posted on {{ post.posted|dateformat('dd.MM.y') }}
+                <br>
+                ({{ post.posted|timedeltaformat }} ago)
+            </p>
         </div>
     </div>
     {% endfor %}
@@ -32,7 +44,12 @@
             {{ form.hidden_tag() }}
 
             <div class="mb-3">
-                {{ form.body(class='form-control', rows='5', placeholder='Reply') }}
+                <i class="text-body-tertiary">Tip: Write 2 or more spaces at the end of a line to fonce a line break</i>
+                {{ form.body(only_input=True, class='form-control', rows='5', placeholder='Reply') }}
+            </div>
+            <div class="mb-3">
+                <p>Preview:</p>
+                {{ form.body(only_preview=True) }}
             </div>
 
             {% if error %}
@@ -46,4 +63,8 @@
     {% endif %}
 </div>
 
+{% endblock %}
+
+{% block extra_head %}
+{{ pagedown.html_head() }}
 {% endblock %}

@@ -30,6 +30,8 @@
             }
         }
     </script>
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body class="d-flex flex-column h-100 bg-light-subtle">
 <nav class="navbar navbar-expand-md navbar-dark bg-dark" aria-label="Navigation">
@@ -43,7 +45,7 @@
         <div class="navbar-collapse collapse" id="globalNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
                     <!-- TODO: Make active section change based on current section -->
                 </li>
                 <li class="nav-item">
@@ -73,10 +75,11 @@
             <li class="nav-item dropdown ms-3 me-2 d-flex">
                 <button class="nav-link dropdown-toggle" href="#" id="dropdownUser" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                    <img src="{{ config.MINIO_ENDPOINT + current_user.id }}" alt="{{ current_user.username }}" width="24" height="24">
+                    <img src="{{ current_user.get_profile_pic() }}" alt="{{ current_user.username }}" width="24" height="24">
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
                     <li><a class="dropdown-item" href="{{ url_for('users.view_current_user') }}">Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">My posts</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a></li>
                 </ul>
             </li>

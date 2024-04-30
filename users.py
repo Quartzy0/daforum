@@ -1,8 +1,6 @@
 import hashlib
 import os
-import uuid
 from io import BytesIO
-from typing import BinaryIO
 
 from PIL import Image
 from flask import Blueprint, render_template, request, redirect, url_for, flash
@@ -10,14 +8,14 @@ from flask_login import *
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 # Import upload file element that will be used in web forms
-from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import NotFound, Unauthorized
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from werkzeug.exceptions import NotFound
 # Import web form elements that will be used in web forms
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms.widgets.core import CheckboxInput
 
-from models import User, db, minio
+from models import User, db, minio, Thread
 
 users = Blueprint("users", __name__, url_prefix="/user", template_folder="templates")
 login_manager = LoginManager()
@@ -47,8 +45,8 @@ def login():
             if not user:
                 flash('Invalid username or password.', 'danger')
                 return render_template("users/login.html", form=form)
-            hashed_password = hashlib.scrypt(str(form.password.data).encode("utf-8"), salt=user.password_salt, r=8, p=1,
-                                             n=32)
+            hashed_password = hashlib.scrypt(str(form.password.data).encode('utf-8'),
+                                             salt=user.password_salt, r=8, p=1, n=32)
             if hashed_password == user.password_hash:
                 login_user(user, remember=form.remember.data)
                 return redirect_dest(url_for("index"))
@@ -67,16 +65,19 @@ def signup():
     if form.validate_on_submit():
         if request.method == 'POST' and 'submit' in request.form:
             salt = os.urandom(16)
-            password_hash = hashlib.scrypt(str(form.password.data).encode("utf-8"), salt=salt, r=8, p=1, n=32)
-            new_user = User(id=str(uuid.uuid4()), username=form.username.data, email=form.email.data,
-                            password_hash=password_hash, password_salt=salt)
+            password_hash = hashlib.scrypt(str(form.password.data).encode("utf-8"), salt=salt, r=8, p=1, n=32, dklen=64)
+            new_user = User(username=form.username.data, email=form.email.data,
+                            password_hash=password_hash,
+                            password_salt=salt)
             try:
                 db.session.add(new_user)
                 db.session.commit()
                 login_user(new_user, remember=form.remember.data)
                 return redirect_dest(url_for("index"))
-            except SQLAlchemyError:
+            except IntegrityError:
                 flash("Username/Email already taken!", "danger")
+            except SQLAlchemyError as e:
+                raise e
 
     return render_template("users/signup.html", form=form)
 
@@ -89,13 +90,23 @@ def view_user(user_id):
     return render_template("users/profile.html", user=user)
 
 
+@users.route("/<user_id>/threads")
+def user_threads(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        raise NotFound("User not found")
+    threads = Thread.query.filter_by(author_id=user_id).all()
+    return render_template("users/threads.html", user=user, threads=threads)
+
+
 @users.route("/", methods=["GET", "POST"])
 @login_required
 def view_current_user():
     form = EditProfileForm()
     if form.validate_on_submit():
-        hashed_password = hashlib.scrypt(str(form.password.data).encode("utf-8"), salt=current_user.password_salt, r=8,
-                                         p=1, n=32)
+        hashed_password = hashlib.scrypt(str(form.password.data).encode("utf-8"),
+                                         salt=current_user.password_salt,
+                                         r=8, p=1, n=32)
         if hashed_password != current_user.password_hash:
             flash("Wrong password.", "danger")
             return render_template("users/edit-profile.html", form=form)
@@ -114,7 +125,7 @@ def view_current_user():
                 img = img.crop((imgL, imgU, imgR, imgB))
                 img.save(temp, format="webp")
                 img_bytes = temp.getvalue()
-                minio.client.put_object("profile-pictures", current_user.id, BytesIO(img_bytes), len(img_bytes),
+                minio.client.put_object("profile-pictures", current_user.str_id, BytesIO(img_bytes), len(img_bytes),
                                         content_type="image/webp")
                 current_user.has_profile_pic = True
             except:

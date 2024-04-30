@@ -13,6 +13,7 @@ FLASK_DEBUG = 1 # 1 for development, 0 for production
 DATABASE_FILE = 'sqlite:///' + path.join(BASE_DIR, 'db.sqlite')
 SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URL') or DATABASE_FILE
 SQLALCHEMY_TRACK_MODIFICATION = False
+DATABASE_UUID_SUPPORT = environ.get('DATABASE_UUID_SUPPORT') == "1" or "sqlite" not in SQLALCHEMY_DATABASE_URI
 
 # Upload Settings
 MINIO_URL = environ.get('MINIO_URL') or "127.0.0.1:9000"

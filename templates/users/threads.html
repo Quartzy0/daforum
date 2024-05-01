@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "post.html" as post %}
 
 {% if liked %}
 {% set liked="liked" %}
@@ -30,28 +31,15 @@
     </div>
 {% for thread in threads %}
     {% if liked %}
-    <div class="card d-flex flex-row-reverse border-5 expand-effect clickable {%if user.likes_thread(thread.id)%}liked{%else%}disliked{%endif%}" onclick="window.location.href='{{ url_for('thread.view_thread', thread_id=thread.id) }}'">
+        {%if user.likes_thread(thread.id)%}
+            {% set class="liked" %}
+        {%else%}
+            {% set class="disliked" %}
+        {%endif%}
+        {{ post.post(thread, current_user, true, true, class) }}
     {% else %}
-    <div class="card d-flex flex-row-reverse border-5 expand-effect clickable" onclick="window.location.href='{{ url_for('thread.view_thread', thread_id=thread.id) }}'">
+        {{ post.post(thread, current_user, true, true) }}
     {% endif %}
-        <div class="card-body d-flex flex-column p-0">
-            <div class="bg-body-tertiary flex-shrink-1">
-                <h5 class="card-title m-2">{{ thread.title }}</h5>
-            </div>
-            <div class="m-2">
-                {{ thread.body | render_markdown | safe }}
-            </div>
-        </div>
-        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
-            <img src="{{ thread.author.get_profile_pic() }}" alt="{{ thread.author.username }}" width="128" height="128">
-            <p><a href="{{ url_for('users.view_user', user_id=thread.author.id) }}">{{ thread.author.username }}</a>
-            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
-                Posted on {{ thread.posted|dateformat('dd.MM.y') }}
-                <br>
-                ({{ thread.posted|timedeltaformat }} ago)
-            </p>
-        </div>
-    </div>
 {% endfor %}
 </div>
 

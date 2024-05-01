@@ -48,12 +48,19 @@
                     <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
                     <!-- TODO: Make active section change based on current section -->
                 </li>
+                {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Following</a>
+                    <a class="nav-link" href="{{ url_for('users.following', user_id=current_user.id) }}">Following</a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" aria-disabled="true">Saved posts</a>
                 </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" aria-disabled="true" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">My posts</a>
+                </li>
+                {% endif %}
             </ul>
             <li class="nav-item dropdown ms-3 me-2 d-flex">
                 <button class="nav-link dropdown-toggle" href="#" id="dropdownPost" data-bs-toggle="dropdown"
@@ -78,7 +85,8 @@
                     <img src="{{ current_user.get_profile_pic() }}" alt="{{ current_user.username }}" width="24" height="24">
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
-                    <li><a class="dropdown-item" href="{{ url_for('users.view_current_user') }}">Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('users.view_user', user_id=current_user.id) }}">Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('users.view_current_user') }}">Account</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">My posts</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a></li>
                 </ul>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import current_user, login_required
 from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
@@ -60,6 +60,8 @@ def like_thread(thread_id):
         like = Likes(user_id=current_user.id, thread_id=thread_id, liked=True)
         db.session.add(like)
     db.session.commit()
+    if "next" in request.form and len(request.form["next"]) > 0:
+        return redirect(request.form["next"])
     return redirect(url_for("thread.view_thread", thread_id=thread_id))
 
 
@@ -76,6 +78,8 @@ def dislike_thread(thread_id):
         like = Likes(user_id=current_user.id, thread_id=thread_id, liked=False)
         db.session.add(like)
     db.session.commit()
+    if "next" in request.form and len(request.form["next"]) > 0:
+        return redirect(request.form["next"])
     return redirect(url_for("thread.view_thread", thread_id=thread_id))
 
 
@@ -87,6 +91,8 @@ def unlike_thread(thread_id):
         raise NotFound("Thread not found")
     Likes.query.filter_by(user_id=current_user.id, thread_id=thread_id).delete()
     db.session.commit()
+    if "next" in request.form and len(request.form["next"]) > 0:
+        return redirect(request.form["next"])
     return redirect(url_for("thread.view_thread", thread_id=thread_id))
 
 

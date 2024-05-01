@@ -1,64 +1,20 @@
 {% extends "base.html" %}
+{% import "post.html" as post %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <div class="m-5">
     <div class="d-flex flex-row gap-3 m-2 align-items-center">
-        <div class="d-flex flex-column align-items-center justify-content-center">
-            {% if current_user.likes_thread(thread.id) %}
-            <form style="width: 24px" method="post" action="{{ url_for('thread.unlike_thread', thread_id=thread.id) }}">
-                <input type="submit" class="arrow-up-circle-fill" value="">
-            </form>
-            {% else %}
-            <form style="width: 24px" method="post" action="{{ url_for('thread.like_thread', thread_id=thread.id) }}">
-                <input type="submit" class="arrow-up-circle" value="">
-            </form>
-            {% endif %}
-            <h5 class="m-1">{{ thread.get_likes() }}</h5>
-            {% if current_user.dislikes_thread(thread.id) %}
-            <form style="width: 24px" method="post" action="{{ url_for('thread.unlike_thread', thread_id=thread.id) }}">
-                <input type="submit" class="arrow-down-circle-fill" value="">
-            </form>
-            {% else %}
-            <form style="width: 24px" method="post" action="{{ url_for('thread.dislike_thread', thread_id=thread.id) }}">
-                <input type="submit" class="arrow-down-circle" value="">
-            </form>
-            {% endif %}
-        </div>
+        {{ post.like_count(thread, current_user) }}
         <h1>{{ thread.title }}</h1>
     </div>
 
-    <div class="card d-flex flex-row-reverse">
-        <div class="card-body">
-            {{ thread.body | render_markdown | safe }}
-        </div>
-        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
-            <img src="{{ thread.author.get_profile_pic() }}" alt="{{ thread.author.username }}" width="128" height="128">
-            <p><a href="{{ url_for('users.view_user', user_id=thread.author.id) }}">{{ thread.author.username }}</a>
-            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
-                Posted on {{ thread.posted|dateformat('dd.MM.y') }}
-                <br>
-                ({{ thread.posted|timedeltaformat }} ago)
-            </p>
-        </div>
-    </div>
+    {# Render with isThread=false in order to not add title #}
+    {{ post.post(thread, current_user, false, false) }}
 
-    {% for post in posts %}
-    <div class="card d-flex flex-row-reverse">
-        <div class="card-body">
-            {{ post.body | render_markdown | safe }}
-        </div>
-        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
-            <img src="{{ post.author.get_profile_pic() }}" alt="{{ post.author.username }}" width="128" height="128">
-            <p><a href="{{ url_for('users.view_user', user_id=post.author.id) }}">{{ post.author.username }}</a>
-            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
-                Posted on {{ post.posted|dateformat('dd.MM.y') }}
-                <br>
-                ({{ post.posted|timedeltaformat }} ago)
-            </p>
-        </div>
-    </div>
+    {% for thread_post in posts %}
+    {{ post.post(thread_post, current_user, false, false) }}
     {% endfor %}
 
     {% if current_user.is_authenticated %}

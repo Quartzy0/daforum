@@ -1,0 +1,66 @@
+{% macro like_count(thread, current_user) %}
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        {% if current_user.is_authenticated and current_user.likes_thread(thread.id) %}
+        <form style="width: 24px" method="post" action="{{ url_for('thread.unlike_thread', thread_id=thread.id) }}">
+            <input type="submit" class="arrow-up-circle-fill" value="">
+            <input type="hidden" id="next" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+        </form>
+        {% else %}
+        <form style="width: 24px" method="post" action="{{ url_for('thread.like_thread', thread_id=thread.id) }}">
+            <input type="submit" class="arrow-up-circle" value="">
+            <input type="hidden" id="next" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+        </form>
+        {% endif %}
+        <h5 class="m-1">{{ thread.get_likes() }}</h5>
+        {% if current_user.is_authenticated and current_user.dislikes_thread(thread.id) %}
+        <form style="width: 24px" method="post" action="{{ url_for('thread.unlike_thread', thread_id=thread.id) }}">
+            <input type="submit" class="arrow-down-circle-fill" value="">
+            <input type="hidden" id="next" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+        </form>
+        {% else %}
+        <form style="width: 24px" method="post" action="{{ url_for('thread.dislike_thread', thread_id=thread.id) }}">
+            <input type="submit" class="arrow-down-circle" value="">
+            <input type="hidden" id="next" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+        </form>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro post(post, current_user, clickable, isThread, classes) %}
+    {% if clickable  %}
+        {% if isThread %}
+        {% set onClick="onclick=\"window.location.href='" + url_for('thread.view_thread', thread_id=post.id) + "'\"" %}
+        <div class="card d-flex flex-row-reverse border-5 expand-effect clickable {{ classes }}">
+        {% else %}
+        {% set onClick="onclick=\"window.location.href='" + url_for('thread.view_thread', thread_id=post.thread.id) + "#post-" + post.id + "'\""  %}
+        <div class="card d-flex flex-row-reverse border-5 expand-effect clickable {{ classes }}">
+        {% endif %}
+    {% else %}
+    <div class="card d-flex flex-row-reverse {{ classes }}" id="post-{{ post.id }}">
+    {% endif %}
+    {% if isThread %}
+        <div class="p-2 bg-body-tertiary d-flex align-items-center">
+        {{ like_count(post, current_user) }}
+        </div>
+    {% endif %}
+        <div class="card-body d-flex flex-column p-0" {{ onClick | safe }}>
+            {% if isThread %} {# If a thread object is passed, add the title #}
+            <div class="bg-body-tertiary flex-shrink-1">
+                <h5 class="card-title m-2">{{ post.title }}</h5>
+            </div>
+            {% endif %}
+            <div class="m-2">
+                {{ post.body | render_markdown | safe }}
+            </div>
+        </div>
+        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center" {{ onClick | safe }}>
+            <img src="{{ post.author.get_profile_pic() }}" alt="{{ post.author.username }}" width="128" height="128">
+            <p><a href="{{ url_for('users.view_user', user_id=post.author.id) }}">{{ post.author.username }}</a>
+            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
+                Posted on {{ post.posted|dateformat('dd.MM.y') }}
+                <br>
+                ({{ post.posted|timedeltaformat }} ago)
+            </p>
+        </div>
+    </div>
+{% endmacro %}

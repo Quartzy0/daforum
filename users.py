@@ -13,9 +13,9 @@ from werkzeug.exceptions import NotFound
 # Import web form elements that will be used in web forms
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
-from wtforms.widgets.core import CheckboxInput
+from wtforms.widgets.core import CheckboxInput, HiddenInput
 
-from models import User, db, minio, Thread
+from models import User, db, minio, Thread, Follows
 
 users = Blueprint("users", __name__, url_prefix="/user", template_folder="templates")
 login_manager = LoginManager()
@@ -87,7 +87,9 @@ def view_user(user_id):
     user = User.query.get(user_id)
     if user is None:
         raise NotFound("User not found")
-    return render_template("users/profile.html", user=user)
+    follow_form = IdNextForm()
+    follow_form.user_id.data = user_id
+    return render_template("users/profile.html", user=user, follow_form=follow_form)
 
 
 @users.route("/<user_id>/threads")
@@ -143,6 +145,84 @@ def logout():
         logout_user()
     return redirect(url_for("index"))
 
+
+@users.route("/follow", methods=["POST"])
+@login_required
+def follow():
+    form = IdNextForm()
+
+    if form.validate_on_submit():
+        followed = User.query.get(form.user_id.data)
+        if not followed:
+            flash("User does not exist!", "danger")
+        else:
+            following = Follows(current_user.id, followed.id)
+            try:
+                db.session.add(following)
+                db.session.commit()
+            except IntegrityError:
+                flash("User already followed!", "danger")
+            except SQLAlchemyError as e:
+                raise e
+    if form.next.data is not None and len(form.next.data) > 0:
+        return redirect(url_for("index") + form.next.data)
+    return redirect(url_for("users.view_user", user_id=form.user_id.data))
+
+
+@users.route("/unfollow", methods=["POST"])
+@login_required
+def unfollow():
+    form = IdNextForm()
+
+    if form.validate_on_submit():
+        followed = User.query.get(form.user_id.data)
+        if not followed:
+            flash("User does not exist!", "danger")
+        else:
+            try:
+                Follows.query.filter_by(following_id=followed.id, follower_id=current_user.id).delete()
+                db.session.commit()
+            except IntegrityError:
+                flash("User not followed!", "danger")
+            except SQLAlchemyError as e:
+                raise e
+    if form.next.data is not None and len(form.next.data) > 0:
+        return redirect(form.next.data)
+    return redirect(url_for("users.view_user", user_id=form.user_id.data))
+
+
+@users.route("/<user_id>/followers")
+def followers(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        raise NotFound("User not found")
+    return render_template("users/followers.html", user=user, followers=user.followers, following=False)
+
+
+@users.route("/<user_id>/following")
+def following(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        raise NotFound("User not found")
+    form = None
+    if current_user.is_authenticated and current_user.str_id == user_id:
+        form = IdNextForm()
+        form.next.data = url_for("users.following", user_id=user_id)
+    return render_template("users/followers.html", user=user, followers=user.follows, following=True,
+                           unfollow_form=form)
+
+
+@users.route("/<user_id>/liked")
+def liked(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        raise NotFound("User not found")
+    form = None
+    if current_user.is_authenticated and current_user.str_id == user_id:
+        form = IdNextForm()
+        form.next.data = url_for("users.liked", user_id=user_id)
+    return render_template("users/threads.html", user=user, threads=[like.thread for like in user.likes],
+                           liked=True, dislike_form=form)
 
 class LoginForm(FlaskForm):
     username = StringField(
@@ -212,3 +292,17 @@ class EditProfileForm(FlaskForm):
         validators=[DataRequired(message="Password required")]
     )
     submit = SubmitField('Save')
+
+
+# Generic form used for following/unfollowing users and liking/unliking/disliking threads
+class IdNextForm(FlaskForm):
+    user_id = StringField(
+        "ID",
+        widget=HiddenInput(),
+        validators=[DataRequired("ID required")]
+    )
+    next = StringField(
+        "Next",
+        widget=HiddenInput()
+    )
+    submit = SubmitField('Follow')

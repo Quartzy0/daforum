@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% if following %}
+{% set action = "Follows" %}
+{% else %}
+{% set action = "Followers" %}
+{% endif %}
+
+{% block title %}
+    {{ user.username }} - {{ action }}
+{% endblock %}
+
+{% block content %}
+
+<div class="m-5">
+    {% if current_user.is_authenticated and user.id==current_user.id %}
+        <h1>Your {{ action }}:</h1>
+    {% else %}
+        <h1><a href="{{ url_for('users.view_user', user_id=user.id) }}">{{ user.username }}'s</a> {{ action }}:</h1>
+    {% endif %}
+
+    {% for follower in followers %}
+        {% if following %}
+        {% set duser = follower.following %}
+        {% else %}
+        {% set duser = follower.follower %}
+        {% endif %}
+
+        <div class="card d-flex flex-column border-5 expand-effect clickable" onclick="window.location.href='{{ url_for('users.view_user', user_id=duser.id) }}'">
+            <div class="card-body d-flex flex-row p-0 align-items-center">
+                <img src="{{ duser.get_profile_pic() }}" alt="{{ duser.username }}" width="64" height="64">
+                <h5 class="card-title m-2">{{ duser.username }}</h5>
+                {% if current_user.is_authenticated and user.id==current_user.id and following %}
+                <form style="margin-left: auto; margin-right: 1rem;" method="post" action="{{ url_for('users.unfollow') }}">
+                    {{ unfollow_form.csrf_token }}
+                    {{ unfollow_form.user_id(value=duser.str_id) }}
+                    {{ unfollow_form.next }}
+                    {{ unfollow_form.submit(class="btn btn-danger", value="Unfollow") }}
+                </form>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <p class="text-body-tertiary font-monospace m-0" style="font-size: 0.7rem;">
+                    Since {{ follower.created_at|dateformat('dd.MM.y') }}
+                    ({{ follower.created_at|timedeltaformat }} ago)
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

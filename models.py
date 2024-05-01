@@ -32,7 +32,8 @@ class UuidStrMixin:
 
 class User(UserMixin, UuidStrMixin, db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True, default=generate_uuid)
+    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True,
+                   default=generate_uuid)
     username = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password_hash = db.Column(db.LargeBinary(64), nullable=False)
@@ -49,6 +50,36 @@ class User(UserMixin, UuidStrMixin, db.Model):
     def get_id(self):
         return self.id
 
+    def follows_user(self, user_id):
+        for follower in self.follows:
+            if follower.following_id == user_id:
+                return True
+        return False
+
+    def followed_by_user(self, user_id):
+        for follower in self.followers:
+            if follower.follower_id == user_id:
+                return True
+        return False
+
+    def likes_thread(self, thread_id):
+        for like in self.likes:
+            if like.thread_id == thread_id:
+                return like.liked
+        return False
+
+    def dislikes_thread(self, thread_id):
+        for like in self.likes:
+            if like.thread_id == thread_id:
+                return not like.liked
+        return False
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def __repr__(self):
         return "<User %r>" % self.id
 
@@ -60,7 +91,8 @@ class User(UserMixin, UuidStrMixin, db.Model):
 
 class Thread(UuidStrMixin, db.Model):
     __tablename__ = "threads"
-    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True, default=generate_uuid)
+    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True,
+                   default=generate_uuid)
     title = db.Column(db.String, nullable=False)
     author_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("users.id"), nullable=False)
     author = db.relationship("User", backref="threads", lazy=True)
@@ -73,13 +105,17 @@ class Thread(UuidStrMixin, db.Model):
         self.author_id = author_id
         self.body = body
 
+    def get_likes(self):
+        return sum([1 if like.liked else -1 for like in self.likes])
+
     def __repr__(self):
         return "<Thread %r>" % self.id
 
 
 class Post(UuidStrMixin, db.Model):
     __tablename__ = "posts"
-    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True, default=generate_uuid)
+    id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), nullable=False, primary_key=True,
+                   default=generate_uuid)
     thread_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("threads.id"), nullable=False)
     thread = db.relationship("Thread", backref="posts", lazy=True)
     author_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("users.id"), nullable=False)
@@ -95,3 +131,38 @@ class Post(UuidStrMixin, db.Model):
 
     def __repr__(self):
         return "<Post %r>" % self.id
+
+
+class Follows(db.Model):
+    __tablename__ = "follows"
+    # The one who is following (the _follower_)
+    follower_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("users.id"),
+                            nullable=False, primary_key=True)
+    follower = db.relationship("User", backref="follows", lazy=True, foreign_keys=[follower_id])
+    # The one who is being followed (the follower is _following_ this user)
+    following_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("users.id"),
+                             nullable=False, primary_key=True)
+    following = db.relationship("User", backref="followers", lazy=True, foreign_keys=[following_id])
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, follower_id, following_id):
+        self.follower_id = follower_id
+        self.following_id = following_id
+
+
+class Likes(db.Model):
+    __tablename__ = "likes"
+    user_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("users.id"),
+                        nullable=False, primary_key=True)
+    user = db.relationship("User", backref="likes", lazy=True)
+    thread_id = db.Column(db.Uuid(as_uuid=config.DATABASE_UUID_SUPPORT), ForeignKey("threads.id"),
+                          nullable=False, primary_key=True)
+    thread = db.relationship("Thread", backref="likes", lazy=True)
+    # True means like, False means dislike
+    liked = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, user_id, thread_id, liked):
+        self.user_id = user_id
+        self.thread_id = thread_id
+        self.liked = liked
+

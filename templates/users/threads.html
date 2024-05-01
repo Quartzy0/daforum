@@ -1,17 +1,39 @@
 {% extends "base.html" %}
 
-{% block title %}{{ user.username }} - Threads{% endblock %}
+{% if liked %}
+{% set liked="liked" %}
+{% else %}
+{% set liked="" %}
+{% endif %}
+
+{% block title %}{{ user.username }}'s {{ liked }} Threads{% endblock %}
 
 {% block content %}
 
 <div class="m-5">
+    <div class="d-flex flex-row align-items-center">
 {% if current_user.is_authenticated and user.id==current_user.id %}
-    <h1>Your threads:</h1>
+        <h1>Your {{ liked }} threads:</h1>
 {% else %}
-    <h1><a href="{{ url_for('users.view_user', user_id=user.id) }}">{{ user.username }}'s</a> threads:</h1>
+        <h1><a href="{{ url_for('users.view_user', user_id=user.id) }}">{{ user.username }}'s</a> {{ liked }} threads:</h1>
 {% endif %}
+{% if liked %}
+    <div class="d-flex flex-row gap-2" style="margin-left: auto">
+        <label for="filter-select" class="fs-3">Filter: </label>
+        <select id="filter-select" style="width: inherit;" class="form-select" onchange="updateFilter()">
+            <option selected value="">None</option>
+            <option value="liked">Liked</option>
+            <option value="disliked">Disliked</option>
+        </select>
+    </div>
+{% endif %}
+    </div>
 {% for thread in threads %}
+    {% if liked %}
+    <div class="card d-flex flex-row-reverse border-5 expand-effect clickable {%if user.likes_thread(thread.id)%}liked{%else%}disliked{%endif%}" onclick="window.location.href='{{ url_for('thread.view_thread', thread_id=thread.id) }}'">
+    {% else %}
     <div class="card d-flex flex-row-reverse border-5 expand-effect clickable" onclick="window.location.href='{{ url_for('thread.view_thread', thread_id=thread.id) }}'">
+    {% endif %}
         <div class="card-body d-flex flex-column p-0">
             <div class="bg-body-tertiary flex-shrink-1">
                 <h5 class="card-title m-2">{{ thread.title }}</h5>
@@ -34,3 +56,34 @@
 </div>
 
 {% endblock %}
+
+{% if liked %}
+{% block javascript %}
+    <script>
+        let selection = document.getElementById("filter-select");
+        function updateFilter() {
+            let filter = selection.value;
+            let liked = document.getElementsByClassName("liked");
+            let disliked = document.getElementsByClassName("disliked");
+            if (filter === "liked" || filter === ""){
+                for (let i = 0; i < liked.length; i++) {
+                    liked[i].classList.remove("hidden");
+                }
+            } else {
+                for (let i = 0; i < liked.length; i++) {
+                    liked[i].classList.add("hidden");
+                }
+            }
+            if (filter === "disliked" || filter === ""){
+                for (let i = 0; i < disliked.length; i++) {
+                    disliked[i].classList.remove("hidden");
+                }
+            } else {
+                for (let i = 0; i < disliked.length; i++) {
+                    disliked[i].classList.add("hidden");
+                }
+            }
+        }
+    </script>
+{% endblock %}
+{% endif %}

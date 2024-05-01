@@ -8,7 +8,25 @@
         <div class="card">
             <div class="card-body">
                 <img src="{{ user.get_profile_pic() }}" alt="Profile picture" width="256" height="256">
+                {% if current_user.is_authenticated and current_user.id!=user.id %}
+                    {% if current_user.follows_user(user.id) %}
+                        <form method="post" class="float-end" action="{{ url_for('users.unfollow') }}">
+                        {{ follow_form.submit(class="btn btn-danger", value="Unfollow") }}
+                    {% else %}
+                        <form method="post" class="float-end" action="{{ url_for('users.follow') }}">
+                        {{ follow_form.submit(class="btn btn-primary") }}
+                    {% endif %}
+                        {{ follow_form.hidden_tag() }}
+                    </form>
+                {% endif %}
                 <h2>{{ user.username }}</h2>
+
+                <p>
+                    Followers: {{ user.followers|length }}
+                    <br>
+                    Following: {{ user.follows|length }}
+                </p>
+
 
                 <p class="text-muted">
                     User Id:
@@ -17,11 +35,11 @@
                 </p>
 
                 {% if current_user.is_authenticated %}
-                <p>
-                    Email:
-                    <br>
-                    {{ user.email }}
-                </p>
+                    <p>
+                        Email:
+                        <br>
+                        {{ user.email }}
+                    </p>
                 {% endif %}
 
                 <p>

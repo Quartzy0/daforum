@@ -50,3 +50,39 @@
 .clickable {
     cursor: pointer;
 }
+
+.arrow-down-circle{
+    background: transparent url("/static/img/arrow-down-circle.svg") no-repeat top left;
+    padding-left: 24px;
+    height: 24px;
+    width: 24px;
+    border: 0 transparent;
+}
+
+.arrow-up-circle{
+    background: transparent url("/static/img/arrow-up-circle.svg") no-repeat top left;
+    padding-left: 24px;
+    height: 24px;
+    width: 24px;
+    border: 0 transparent;
+}
+
+.arrow-down-circle-fill{
+    background: transparent url("/static/img/arrow-down-circle-fill.svg") no-repeat top left;
+    padding-left: 24px;
+    height: 24px;
+    width: 24px;
+    border: 0 transparent;
+}
+
+.arrow-up-circle-fill{
+    background: transparent url("/static/img/arrow-up-circle-fill.svg") no-repeat top left;
+    padding-right: 24px;
+    height: 24px;
+    width: 24px;
+    border: 0 transparent;
+}
+
+.hidden {
+    visibility: collapse;
+}

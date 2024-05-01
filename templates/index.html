@@ -1,11 +1,25 @@
 {% extends "base.html" %}
+{% import "post.html" as post %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 
 {% if current_user.is_authenticated %}
-    Hello {{ current_user.username }}
+    <div class="m-5">
+        {% set thread_feed=current_user.get_feed(20) %}
+        {% set prev = namespace(val="")  %}
+        {% for thread in thread_feed %}
+            {# Note: Indexes in loops start with 1 for some reason #}
+            {% if prev.val != thread.author.str_id %}
+                {% set prev.val = thread.author.str_id %}
+                <div class="d-flex flex-row m-1">
+                    <img src="{{ thread.author.get_profile_pic() }}" alt="{{ thread.author.username }}" width="24" height="24">
+                    <p><a href="{{ url_for('users.view_user', user_id=thread.author_id) }}">{{ thread.author.username }}</a> posted:</p>
+                </div>
+            {% endif %}
+            {{ post.post(thread, current_user, true, true) }}
+        {% endfor %}
+    </div>
 {% endif %}
-
 {% endblock %}

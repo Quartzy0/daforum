@@ -5,7 +5,7 @@ from flask import url_for
 from flask_login import UserMixin
 from flask_minio import Minio
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, desc
 
 import config
 
@@ -73,6 +73,10 @@ class User(UserMixin, UuidStrMixin, db.Model):
             if like.thread_id == thread_id:
                 return not like.liked
         return False
+
+    def get_feed(self, limit):
+        return Thread.query.filter(Thread.author_id.in_([follow.following_id for follow in self.follows])).order_by(
+            desc(Thread.posted)).limit(limit).all()
 
     def __eq__(self, other):
         return self.id == other.id
@@ -165,4 +169,3 @@ class Likes(db.Model):
         self.user_id = user_id
         self.thread_id = thread_id
         self.liked = liked
-

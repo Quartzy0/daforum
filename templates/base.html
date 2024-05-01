@@ -87,7 +87,7 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
                     <li><a class="dropdown-item" href="{{ url_for('users.view_user', user_id=current_user.id) }}">Profile</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.view_current_user') }}">Account</a></li>
-                    <li><a class="dropdown-item" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">My posts</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">My threads</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a></li>
                 </ul>
             </li>

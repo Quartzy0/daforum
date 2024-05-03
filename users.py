@@ -13,6 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from werkzeug.exceptions import NotFound
 # Import web form elements that will be used in web forms
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
+from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms.widgets.core import CheckboxInput, HiddenInput, TextArea
 
@@ -117,6 +118,10 @@ def view_current_user():
         current_user.email = form.email.data
         current_user.signature = form.signature.data
         current_user.description = form.description.data
+        if form.gender.data == "Rather not say":
+            current_user.gender = None
+        else:
+            current_user.gender = form.gender.data == "Male"
 
         image = form.profilePicture.data
         if image is not None:
@@ -141,6 +146,12 @@ def view_current_user():
         form.email.data = current_user.email
         form.signature.data = current_user.signature
         form.description.data = current_user.description
+        if current_user.gender is None:
+            form.gender.data = "Rather not say"
+        elif current_user.gender:
+            form.gender.data = "Male"
+        else:
+            form.gender.data = "Female"
     return render_template("users/edit-profile.html", form=form)
 
 
@@ -298,6 +309,10 @@ class EditProfileForm(FlaskForm):
     )
     signature = PageDownField(
         "Signature"
+    )
+    gender = SelectField(
+        "Gender",
+        choices=["Male", "Female", "Rather not say"],
     )
     password = PasswordField(
         "Password",

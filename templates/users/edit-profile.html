@@ -34,6 +34,11 @@
                 </div>
 
                 <div class="mb-3">
+                    {{ form.gender.label(class='form-label') }}
+                    {{ form.gender(class='form-control') }}
+                </div>
+
+                <div class="mb-3">
                     {{ form.signature.label(class='form-label') }}
                     {{ form.signature(only_input=True, class='form-control', rows='2', placeholder='Signature') }}
                 </div>

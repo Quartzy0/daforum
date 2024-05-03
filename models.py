@@ -42,6 +42,7 @@ class User(UserMixin, UuidStrMixin, db.Model):
     has_profile_pic = db.Column(db.Boolean, nullable=False, default=False)
     description = db.Column(db.String, nullable=True)
     signature = db.Column(db.String, nullable=True)
+    gender = db.Column(db.Boolean, nullable=True)
 
     def __init__(self, username, email, password_hash, password_salt):
         self.username = username

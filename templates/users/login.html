@@ -23,6 +23,13 @@
         {{ form.remember(class='form-check-input') }}
         {{ form.remember.label(class='form-check-label') }}
     </div>
+
+    <ul class="alert alert-danger d-flex flex-column justify-content-center align-items-center">
+    {% for field, errors in form.errors.items() %}
+        <li class="text-danger">{{ ', '.join(errors) }}</li>
+    {% endfor %}
+    </ul>
+
     {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
 
     <p>Don't have an account? <a href="{{ url_for('users.signup', **request.args) }}">Sign up</a></p>

@@ -247,7 +247,7 @@ class SigunUpForm(FlaskForm):
     )
     email = StringField(
         "Email",
-        validators=[Email("Email required")]
+        validators=[Email("Valid email required")]
     )
     password = PasswordField(
         "Password",

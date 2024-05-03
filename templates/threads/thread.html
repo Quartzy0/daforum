@@ -5,6 +5,11 @@
 
 {% block content %}
 <div class="m-5">
+{% if current_user.is_authenticated and current_user.str_id==thread.author.str_id and thread.seconds_posted() < 600 %}
+    <form class="float-end" method="post" action="{{ url_for('thread.delete_thread', thread_id=thread.id) }}">
+        <input type="submit" class="btn btn-danger" value="Delete">
+    </form>
+{% endif %}
     <div class="d-flex flex-row gap-3 m-2 align-items-center">
         {{ post.like_count(thread, current_user) }}
         <h1>{{ thread.title }}</h1>

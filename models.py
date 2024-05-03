@@ -112,6 +112,9 @@ class Thread(UuidStrMixin, db.Model):
     def get_likes(self):
         return sum([1 if like.liked else -1 for like in self.likes])
 
+    def seconds_posted(self):
+        return (datetime.utcnow() - self.posted).total_seconds()
+
     def __repr__(self):
         return "<Thread %r>" % self.id
 
@@ -132,6 +135,9 @@ class Post(UuidStrMixin, db.Model):
         self.author_id = author_id
         self.thread_id = thread_id
         self.body = body
+
+    def seconds_posted(self):
+        return (datetime.utcnow() - self.posted).total_seconds()
 
     def __repr__(self):
         return "<Post %r>" % self.id

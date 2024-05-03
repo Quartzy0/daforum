@@ -24,7 +24,7 @@ Markdown==3.6
 MarkupSafe==2.1.5
 minio==7.2.6
 pillow==10.3.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pycparser==2.22
 pycryptodome==3.20.0
 pytz==2024.1

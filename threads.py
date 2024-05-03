@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from datetime import datetime
+
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import current_user, login_required
 from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
@@ -94,6 +96,26 @@ def unlike_thread(thread_id):
     if "next" in request.form and len(request.form["next"]) > 0:
         return redirect(request.form["next"])
     return redirect(url_for("thread.view_thread", thread_id=thread_id))
+
+
+@threads.route("/<thread_id>/delete", methods=["POST"])
+@login_required
+def delete_thread(thread_id):
+    thread: Thread = Thread.query.get(thread_id)
+    if thread is None:
+        raise NotFound("Thread not found")
+    if (datetime.utcnow() - thread.posted).total_seconds() > 600:
+        flash("Cannot delete thread if it is older than 10 minutes", "danger")
+        if "next" in request.form and len(request.form["next"]) > 0:
+            return redirect(request.form["next"])
+        return redirect(url_for("thread.view_thread", thread_id=thread_id))
+    Post.query.filter_by(thread_id=thread_id).delete()
+    Likes.query.filter_by(thread_id=thread_id).delete()
+    Thread.query.filter_by(id=thread_id).delete()
+    db.session.commit()
+    if "next" in request.form and len(request.form["next"]) > 0:
+        return redirect(request.form["next"])
+    return redirect(url_for("index"))
 
 
 class NewThreadForm(FlaskForm):

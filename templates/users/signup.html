@@ -10,30 +10,36 @@
     <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="Logo" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
-    <div class="form-floating mb-3">
-        {{ form.username(class='form-control', placeholder='Username') }}
+    <div class="mb-3">
         {{ form.username.label }}
+        {{ form.username(class='form-control', placeholder='Username') }}
     </div>
     <br>
-    <div class="form-floating mb-3">
-        {{ form.email(class='form-control', placeholder='Email') }}
+    <div class="mb-3">
         {{ form.email.label }}
+        {{ form.email(class='form-control', placeholder='Email') }}
     </div>
     <br>
-    <div class="form-floating mb-3">
-        {{ form.password(class='form-control', placeholder='Password') }}
+    <div class="mb-3">
         {{ form.password.label }}
+        {{ form.password(class='form-control', placeholder='Password') }}
     </div>
     <br>
-    <div class="form-floating mb-3">
-        {{ form.passwordConfirmation(class='form-control', placeholder='Confirm Password') }}
+    <div class="mb-3">
         {{ form.passwordConfirmation.label }}
+        {{ form.passwordConfirmation(class='form-control', placeholder='Confirm Password') }}
     </div>
 
     <div class="checkbox mb-3">
-        {{ form.remember(class='form-check-input') }}
         {{ form.remember.label(class='form-check-label') }}
+        {{ form.remember(class='form-check-input') }}
     </div>
+
+    <ul class="alert alert-danger d-flex flex-column justify-content-center align-items-center">
+    {% for field, errors in form.errors.items() %}
+        <li class="text-danger">{{ ', '.join(errors) }}</li>
+    {% endfor %}
+    </ul>
     {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
     <p>Already have an account? <a href="{{ url_for('users.login', **request.args) }}">Log in</a></p>
 </form>

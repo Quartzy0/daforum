@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "post.html" as post %}
 
 {% block title %}New Thread{% endblock %}
 
@@ -18,20 +19,7 @@
     </div>
     <div class="mb-3">
         <h3>Preview:</h3>
-        <div class="m-5 card d-flex flex-row-reverse">
-            <div class="card-body">
-                {{ form.body(only_preview=True) }}
-            </div>
-            <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
-                <img src="{{ current_user.get_profile_pic() }}" alt="{{ current_user.username }}" width="128" height="128">
-                <p><a href="{{ url_for('users.view_user', user_id=current_user.id) }}">{{ current_user.username }}</a>
-                <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;" id="replaceDate">
-                    Posted on !DATE!
-                    <br>
-                    (0s ago)
-                </p>
-            </div>
-        </div>
+        {{ post.post_preview(form.body(only_preview=True), current_user) }}
     </div>
 
     {% if error %}
@@ -46,12 +34,4 @@
 
 {% block extra_head %}
 {{ pagedown.html_head() }}
-{% endblock %}
-
-{% block javascript %}
-<script>
-let date = new Date();
-let dateString = date.getDate() + "." + date.getMonth() + "." + date.getFullYear();
-document.getElementById("replaceDate").innerHTML = document.getElementById("replaceDate").innerHTML.replace("!DATE!", dateString);
-</script>
 {% endblock %}

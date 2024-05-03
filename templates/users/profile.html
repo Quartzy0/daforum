@@ -21,6 +21,12 @@
                 {% endif %}
                 <h2>{{ user.username }}</h2>
 
+                {% if user.description %}
+                <p>
+                    {{ user.description }}
+                </p>
+                {% endif %}
+
                 <p>
                     <a href="{{ url_for('users.followers', user_id=user.id) }}">Followers: {{ user.followers|length }}</a>
                     <br>

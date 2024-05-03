@@ -40,6 +40,8 @@ class User(UserMixin, UuidStrMixin, db.Model):
     password_salt = db.Column(db.LargeBinary(16), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     has_profile_pic = db.Column(db.Boolean, nullable=False, default=False)
+    description = db.Column(db.String, nullable=True)
+    signature = db.Column(db.String, nullable=True)
 
     def __init__(self, username, email, password_hash, password_salt):
         self.username = username

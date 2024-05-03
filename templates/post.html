@@ -26,7 +26,7 @@
     </div>
 {% endmacro %}
 
-{% macro post(post, current_user, clickable, isThread, classes) %}
+{% macro post(post, current_user, clickable, isThread, showSignature, classes) %}
     {% if clickable  %}
         {% if isThread %}
         {% set onClick="onclick=\"window.location.href='" + url_for('thread.view_thread', thread_id=post.id) + "'\"" %}
@@ -52,6 +52,14 @@
             <div class="m-2">
                 {{ post.body | render_markdown | safe }}
             </div>
+            {% if (showSignature is not defined or showSignature) and post.author.signature %}
+                <div class="flex-shrink-1" style="margin-top: auto;">
+                    <hr/>
+                    <div class="p-0" style="max-height: 6rem; overflow: scroll;">
+                    {{ post.author.signature | render_markdown | safe }}
+                    </div>
+                </div>
+            {% endif %}
         </div>
         <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center" {{ onClick | safe }}>
             <img src="{{ post.author.get_profile_pic() }}" alt="{{ post.author.username }}" width="128" height="128">
@@ -60,6 +68,40 @@
                 Posted on {{ post.posted|dateformat('dd.MM.y') }}
                 <br>
                 ({{ post.posted|timedeltaformat }} ago)
+            </p>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro post_preview(body, current_user, signature, classes) %}
+    <div class="card d-flex flex-row-reverse {{ classes }}">
+        <div class="card-body d-flex flex-column p-0">
+            <div class="m-2">
+                {{ body | render_markdown | safe }}
+            </div>
+            <div class="flex-shrink-1" style="margin-top: auto;">
+                <hr/>
+                <div class="p-0" style="max-height: 6rem; overflow: scroll;">
+                {% if signature is defined and signature %}
+                {{ signature }}
+                {% elif current_user is defined and current_user.is_authenticated and current_user.signature %}
+                {{ current_user.signature | render_markdown | safe }}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer flex-shrink-1 d-flex flex-column align-items-center">
+            {% if current_user is defined and current_user.is_authenticated %}
+                <img src="{{ current_user.get_profile_pic() }}" alt="{{ current_user.username }}" width="128" height="128">
+                <p><a href="{{ url_for('users.view_user', user_id=current_user.id) }}">{{ current_user.username }}</a>
+            {% else %}
+                <img src="{{ url_for('static', filename="img/profile.png") }}" alt="User profile pic" width="128" height="128">
+                <p><a href="">User</a>
+            {% endif %}
+            <p class="text-body-tertiary font-monospace text-center" style="font-size: 0.7rem;">
+                Posted on 1.1.1970
+                <br>
+                (1 year ago)
             </p>
         </div>
     </div>

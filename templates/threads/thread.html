@@ -36,10 +36,12 @@
                 {{ form.body(only_preview=True) }}
             </div>
 
-            {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
+            {% if form.errors.items() | length > 0 %}
+            <ul class="alert alert-danger d-flex flex-column justify-content-center align-items-center">
+            {% for field, errors in form.errors.items() %}
+                <li class="text-danger">{{ ', '.join(errors) }}</li>
+            {% endfor %}
+            </ul>
             {% endif %}
             {{ form.submit(class='w-100 btn btn-lg btn-primary') }}
         </form>

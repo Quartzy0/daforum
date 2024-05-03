@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "post.html" as post %}
 
 {% block title %}Edit profile{% endblock %}
 
@@ -19,7 +20,7 @@
 
                 <div class="text-muted">
                     <label for="user_id">User ID:</label>
-                    <input id="user_id" value="{{ current_user.id }}" type="text" class="form-control" readonly>
+                    <input id="user_id" value="{{ current_user.id }}" type="text" class="form-control" disabled readonly>
                 </div>
 
                 <div class="mb-3">
@@ -32,6 +33,20 @@
                     {{ form.email(class='form-control') }}
                 </div>
 
+                <div class="mb-3">
+                    {{ form.signature.label(class='form-label') }}
+                    {{ form.signature(only_input=True, class='form-control', rows='2', placeholder='Signature') }}
+                </div>
+                <div class="mb-3">
+                    <p>Signature preview:</p>
+                    {{ post.post_preview("Body of the post", current_user, form.signature(only_preview=True)) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.description.label(class='form-label') }}
+                    {{ form.description(class='form-control') }}
+                </div>
+
                 <p>
                     Created on:
                     <br>
@@ -39,6 +54,9 @@
                 </p>
 
                 <a class="link-body-emphasis" href="{{ url_for('users.user_threads', user_id=current_user.id) }}">View your threads</a>
+
+                <br>
+                <br>
 
                 <div class="mb-3">
                     {{ form.password.label(class='form-label') }}
@@ -106,4 +124,8 @@
             {#container.items.add(file);#}
             {#fileElement.files = container.files;#}
     </script>
+{% endblock %}
+
+{% block extra_head %}
+{{ pagedown.html_head() }}
 {% endblock %}

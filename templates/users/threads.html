@@ -36,9 +36,9 @@
         {%else%}
             {% set class="disliked" %}
         {%endif%}
-        {{ post.post(thread, current_user, true, true, class) }}
+        {{ post.post(thread, current_user, true, true, false, class) }}
     {% else %}
-        {{ post.post(thread, current_user, true, true) }}
+        {{ post.post(thread, current_user, true, true, false) }}
     {% endif %}
 {% endfor %}
 </div>
@@ -49,6 +49,7 @@
 {% block javascript %}
     <script>
         let selection = document.getElementById("filter-select");
+        selection.value = "";
         function updateFilter() {
             let filter = selection.value;
             let liked = document.getElementsByClassName("liked");

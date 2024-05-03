@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import *
+from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 # Import upload file element that will be used in web forms
@@ -13,7 +14,7 @@ from werkzeug.exceptions import NotFound
 # Import web form elements that will be used in web forms
 from wtforms import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
-from wtforms.widgets.core import CheckboxInput, HiddenInput
+from wtforms.widgets.core import CheckboxInput, HiddenInput, TextArea
 
 from models import User, db, minio, Thread, Follows
 
@@ -114,6 +115,8 @@ def view_current_user():
             return render_template("users/edit-profile.html", form=form)
         current_user.username = form.username.data
         current_user.email = form.email.data
+        current_user.signature = form.signature.data
+        current_user.description = form.description.data
 
         image = form.profilePicture.data
         if image is not None:
@@ -136,6 +139,8 @@ def view_current_user():
     else:
         form.username.data = current_user.username
         form.email.data = current_user.email
+        form.signature.data = current_user.signature
+        form.description.data = current_user.description
     return render_template("users/edit-profile.html", form=form)
 
 
@@ -286,6 +291,13 @@ class EditProfileForm(FlaskForm):
     email = StringField(
         "Email",
         validators=[Email("Email required")]
+    )
+    description = StringField(
+        "User Description",
+        widget=TextArea()
+    )
+    signature = PageDownField(
+        "Signature"
     )
     password = PasswordField(
         "Password",

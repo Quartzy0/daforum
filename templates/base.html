@@ -18,11 +18,13 @@
     <script>
         function darkModeToggle() {
             if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+                document.querySelector(":root").style.setProperty("--dark-invert", '100%');
                 document.documentElement.setAttribute('data-bs-theme', 'light');
                 document.getElementById("darkModeToggleSun").style.display = "none";
                 document.getElementById("darkModeToggleMoon").style.display = "block";
                 window.localStorage.setItem("darkMode", "false");
             } else {
+                document.querySelector(":root").style.setProperty("--dark-invert", '0%');
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
                 document.getElementById("darkModeToggleSun").style.display = "block";
                 document.getElementById("darkModeToggleMoon").style.display = "none";

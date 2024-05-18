@@ -15,11 +15,11 @@
     </div>
     <div class="mb-3">
         <i class="text-body-tertiary">Tip: Write 2 or more spaces at the end of a line to fonce a line break</i>
-        {{ form.body(only_input=True, class='form-control', rows='11', placeholder='Reply') }}
+        {{ form.body(class='form-control', rows='11', placeholder='Reply') }}
     </div>
-    <div class="mb-3">
+    <div class="mb-3 make-pretty">
         <h3>Preview:</h3>
-        {{ post.post_preview(form.body(only_preview=True), current_user) }}
+        {{ post.post_preview(mde.preview, current_user) }}
     </div>
 
     {% if error %}
@@ -33,5 +33,9 @@
 {% endblock %}
 
 {% block extra_head %}
-{{ pagedown.html_head() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/mde.css") }}">
+{% endblock %}
+
+{% block javascript %}
+{{ mde.js }}
 {% endblock %}

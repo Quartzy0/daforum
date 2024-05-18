@@ -40,11 +40,11 @@
 
                 <div class="mb-3">
                     {{ form.signature.label(class='form-label') }}
-                    {{ form.signature(only_input=True, class='form-control', rows='2', placeholder='Signature') }}
+                    {{ form.signature(class='form-control', rows='2', placeholder='Signature') }}
                 </div>
                 <div class="mb-3">
                     <p>Signature preview:</p>
-                    {{ post.post_preview("Body of the post", current_user, form.signature(only_preview=True)) }}
+                    {{ post.post_preview("Body of the post", current_user, mde.preview) }}
                 </div>
 
                 <div class="mb-3">
@@ -82,6 +82,7 @@
 {% endblock %}
 
 {% block javascript %}
+    {{ mde.js }}
     <script type="text/javascript" src="{{ url_for('static', filename='js/cropper.js') }}"></script>
     <script>
         let currentPfp = "{{ current_user.get_profile_pic() }}";
@@ -132,5 +133,5 @@
 {% endblock %}
 
 {% block extra_head %}
-{{ pagedown.html_head() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="css/mde.css") }}">
 {% endblock %}

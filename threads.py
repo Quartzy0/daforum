@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import current_user, login_required
-from flask_pagedown.fields import PageDownField
+from flask_mde import MdeField
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import NotFound
 from wtforms.fields.simple import StringField, SubmitField
@@ -120,10 +120,10 @@ def delete_thread(thread_id):
 
 class NewThreadForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired("Please enter a title.")])
-    body = PageDownField("Body", validators=[DataRequired("Please enter a body.")])
+    body = MdeField("Body", validators=[DataRequired("Please enter a body.")])
     submit = SubmitField("Post")
 
 
 class ReplyForm(FlaskForm):
-    body = PageDownField("Reply", validators=[DataRequired("Please enter a body.")])
+    body = MdeField("Reply", validators=[DataRequired("Please enter a body.")])
     submit = SubmitField("Reply")

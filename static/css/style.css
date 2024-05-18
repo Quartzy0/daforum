@@ -1,3 +1,7 @@
+:root {
+    --dark-invert: 0%;
+}
+
 .form-signin {
     width: 100%;
     max-width: 330px;
@@ -52,6 +56,7 @@
 }
 
 .arrow-down-circle{
+    filter: invert(var(--dark-invert));
     background: transparent url("/static/img/arrow-down-circle.svg") no-repeat top left;
     padding-left: 24px;
     height: 24px;
@@ -60,6 +65,7 @@
 }
 
 .arrow-up-circle{
+    filter: invert(var(--dark-invert));
     background: transparent url("/static/img/arrow-up-circle.svg") no-repeat top left;
     padding-left: 24px;
     height: 24px;
@@ -68,6 +74,7 @@
 }
 
 .arrow-down-circle-fill{
+    filter: invert(var(--dark-invert));
     background: transparent url("/static/img/arrow-down-circle-fill.svg") no-repeat top left;
     padding-left: 24px;
     height: 24px;
@@ -76,6 +83,7 @@
 }
 
 .arrow-up-circle-fill{
+    filter: invert(var(--dark-invert));
     background: transparent url("/static/img/arrow-up-circle-fill.svg") no-repeat top left;
     padding-right: 24px;
     height: 24px;

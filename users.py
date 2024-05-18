@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import *
+from flask_mde import MdeField
 from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -307,7 +308,7 @@ class EditProfileForm(FlaskForm):
         "User Description",
         widget=TextArea()
     )
-    signature = PageDownField(
+    signature = MdeField(
         "Signature"
     )
     gender = SelectField(

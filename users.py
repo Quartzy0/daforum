@@ -6,7 +6,6 @@ from PIL import Image
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import *
 from flask_mde import MdeField
-from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 # Import upload file element that will be used in web forms
@@ -18,7 +17,8 @@ from wtforms.fields.choices import SelectField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms.widgets.core import CheckboxInput, HiddenInput, TextArea
 
-from models import User, db, minio, Thread, Follows
+import util
+from models import User, db, Thread, Follows
 
 users = Blueprint("users", __name__, url_prefix="/user", template_folder="templates")
 login_manager = LoginManager()
@@ -136,8 +136,7 @@ def view_current_user():
                 img = img.crop((imgL, imgU, imgR, imgB))
                 img.save(temp, format="webp")
                 img_bytes = temp.getvalue()
-                minio.client.put_object("profile-pictures", current_user.str_id, BytesIO(img_bytes), len(img_bytes),
-                                        content_type="image/webp")
+                util.put_object("profile-pictures", current_user.str_id, BytesIO(img_bytes), len(img_bytes),"image/webp")
                 current_user.has_profile_pic = True
             except:
                 flash("Error when processing profile picture", "danger")

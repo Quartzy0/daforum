@@ -5,8 +5,10 @@ from flask_mde import Mde
 from werkzeug.exceptions import HTTPException
 
 from users import users, login_manager
-from models import db, minio
+from models import db
 from threads import threads
+import util
+from logging.config import dictConfig
 
 # Create new instance of a web application
 app = Flask(__name__, instance_relative_config=False)
@@ -18,8 +20,25 @@ app.register_blueprint(threads)
 
 login_manager.init_app(app)
 db.init_app(app)
-minio.init_app(app)
 mde = Mde(app)
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
+util.init_obj_store(app)
 
 
 @app.template_filter('render_markdown')

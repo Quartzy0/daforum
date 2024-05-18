@@ -1,16 +1,15 @@
 import uuid
 from datetime import datetime
-
 from flask import url_for
 from flask_login import UserMixin
-from flask_minio import Minio
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, desc
 
 import config
+import util
 
 db = SQLAlchemy()
-minio = Minio()
 
 
 def generate_uuid():
@@ -92,7 +91,7 @@ class User(UserMixin, UuidStrMixin, db.Model):
 
     def get_profile_pic(self):
         if self.has_profile_pic:
-            return config.MINIO_ENDPOINT + self.str_id
+            return util.get_object_url("profile-pictures", self.str_id)
         return url_for('static', filename='img/profile.png')
 
 

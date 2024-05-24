@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "post.html" as post %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+
+    <div class="m-5">
+        <h1>Results for '{{ query }}':</h1>
+        {% for thread in threads %}
+            {% if liked %}
+                {%if user.likes_thread(thread.id)%}
+                    {% set class="liked" %}
+                {%else%}
+                    {% set class="disliked" %}
+                {%endif%}
+                {{ post.post(thread, current_user, true, true, false, class) }}
+            {% else %}
+                {{ post.post(thread, current_user, true, true, false) }}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {{ post.render_pagination(threads, 'thread.search', q=query) }}
+
+{% endblock %}

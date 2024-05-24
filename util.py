@@ -24,7 +24,7 @@ def init_obj_store(app):
         def get_obj(bucket, name):
             with open(os.path.join("store", bucket, name) + "_meta", "r") as f:
                 content_type = f.read()
-            return send_from_directory("store", os.path.join(bucket, name), mimetype=content_type)
+            return send_from_directory(os.path.join("store", bucket), name, mimetype=content_type)
 
         app.register_blueprint(objs)
 

@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import current_user, login_required
 from flask_mde import MdeField
 from flask_wtf import FlaskForm
+from sqlalchemy import desc
 from werkzeug.exceptions import NotFound
 from wtforms.fields.simple import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -116,6 +117,20 @@ def delete_thread(thread_id):
     if "next" in request.form and len(request.form["next"]) > 0:
         return redirect(request.form["next"])
     return redirect(url_for("index"))
+
+
+@threads.route("/search", methods=["GET"])
+def search():
+    q = request.args.get("q", default="", type=str)
+    threads = []
+    if q is not None and len(q) > 0:
+        threads = Thread.query.filter(Thread.title.ilike("%" + q + "%")).order_by(desc(Thread.posted)).paginate(
+            max_per_page=100, per_page=3)
+        if threads.total == 0:
+            flash("No results found", "danger")
+    else:
+        flash("Please enter a search query", "danger")
+    return render_template("threads/search.html", query=q, threads=threads)
 
 
 class NewThreadForm(FlaskForm):
